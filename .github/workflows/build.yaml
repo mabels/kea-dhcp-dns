@@ -21,11 +21,8 @@ jobs:
       contents: read
       packages: write
     steps:
-      - name: Checkout ISC kea-docker repository
-        uses: actions/checkout@v4
-        with:
-          repository: isc-projects/kea-docker
-          ref: master
+      - name: Clone ISC kea-docker repository
+        run: git clone https://gitlab.isc.org/isc-projects/kea-docker.git
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
@@ -53,8 +50,8 @@ jobs:
       - name: Build and push kea-dhcp4
         uses: docker/build-push-action@v5
         with:
-          context: ./kea-dhcp4
-          file: ./kea-dhcp4/Dockerfile
+          context: ./kea-docker/kea-dhcp4
+          file: ./kea-docker/kea-dhcp4/Dockerfile
           platforms: linux/amd64,linux/arm64
           push: true
           tags: ${{ steps.meta.outputs.tags }}
@@ -70,11 +67,8 @@ jobs:
       contents: read
       packages: write
     steps:
-      - name: Checkout ISC kea-docker repository
-        uses: actions/checkout@v4
-        with:
-          repository: isc-projects/kea-docker
-          ref: master
+      - name: Clone ISC kea-docker repository
+        run: git clone https://gitlab.isc.org/isc-projects/kea-docker.git
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
@@ -102,8 +96,8 @@ jobs:
       - name: Build and push kea-dhcp6
         uses: docker/build-push-action@v5
         with:
-          context: ./kea-dhcp6
-          file: ./kea-dhcp6/Dockerfile
+          context: ./kea-docker/kea-dhcp6
+          file: ./kea-docker/kea-dhcp6/Dockerfile
           platforms: linux/amd64,linux/arm64
           push: true
           tags: ${{ steps.meta.outputs.tags }}
@@ -119,11 +113,8 @@ jobs:
       contents: read
       packages: write
     steps:
-      - name: Checkout ISC kea-docker repository
-        uses: actions/checkout@v4
-        with:
-          repository: isc-projects/kea-docker
-          ref: master
+      - name: Clone ISC kea-docker repository
+        run: git clone https://gitlab.isc.org/isc-projects/kea-docker.git
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
@@ -151,8 +142,8 @@ jobs:
       - name: Build and push kea-dhcp-ddns
         uses: docker/build-push-action@v5
         with:
-          context: ./kea-dhcp-ddns
-          file: ./kea-dhcp-ddns/Dockerfile
+          context: ./kea-docker/kea-dhcp-ddns
+          file: ./kea-docker/kea-dhcp-ddns/Dockerfile
           platforms: linux/amd64,linux/arm64
           push: true
           tags: ${{ steps.meta.outputs.tags }}
