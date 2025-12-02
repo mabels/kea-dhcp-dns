@@ -16,7 +16,7 @@ env:
 
 jobs:
   build-kea-dhcp4-amd64:
-    runs-on: ubuntu-latest
+    runs-on: runs-on,runner=2cpu-linux-x64
     permissions:
       contents: read
       packages: write
@@ -48,7 +48,7 @@ jobs:
             KEA_VERSION=${{ env.KEA_VERSION }}
 
   build-kea-dhcp4-arm64:
-    runs-on: ubuntu-24.04-arm64
+    runs-on: runs-on,runner=2cpu-linux-arm64
     permissions:
       contents: read
       packages: write
@@ -81,7 +81,7 @@ jobs:
 
   create-kea-dhcp4-manifest:
     needs: [build-kea-dhcp4-amd64, build-kea-dhcp4-arm64]
-    runs-on: ubuntu-latest
+    runs-on: runs-on,runner=2cpu-linux-x64
     permissions:
       contents: read
       packages: write
@@ -101,7 +101,7 @@ jobs:
             ${{ env.REGISTRY }}/${{ github.repository }}/kea-dhcp4:latest-arm64
 
   build-kea-dhcp-ddns-amd64:
-    runs-on: ubuntu-latest
+    runs-on: runs-on,runner=2cpu-linux-x64
     permissions:
       contents: read
       packages: write
@@ -133,7 +133,7 @@ jobs:
             KEA_VERSION=${{ env.KEA_VERSION }}
 
   build-kea-dhcp-ddns-arm64:
-    runs-on: ubuntu-24.04-arm64
+    runs-on: runs-on,runner=2cpu-linux-arm64
     permissions:
       contents: read
       packages: write
@@ -166,7 +166,7 @@ jobs:
 
   create-kea-dhcp-ddns-manifest:
     needs: [build-kea-dhcp-ddns-amd64, build-kea-dhcp-ddns-arm64]
-    runs-on: ubuntu-latest
+    runs-on: runs-on,runner=2cpu-linux-x64
     permissions:
       contents: read
       packages: write

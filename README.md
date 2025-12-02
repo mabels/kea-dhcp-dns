@@ -47,12 +47,20 @@ To update the Kea version, modify the `KEA_VERSION` environment variable in `.gi
 
 ## Architecture
 
-The workflow builds on **native runners** for maximum performance:
-- **AMD64 builds** run on standard `ubuntu-latest` runners
-- **ARM64 builds** run on `ubuntu-24.04-arm64` runners
+The workflow builds on **native runners** using [runs-on](https://github.com/runs-on/action) with AWS:
+- **AMD64 builds** run on `2cpu-linux-x64` runners (AWS x86_64 instances)
+- **ARM64 builds** run on `2cpu-linux-arm64` runners (AWS ARM64 instances)
 - No QEMU emulation is used, resulting in faster and more reliable builds
+- Runners are provisioned on-demand in your AWS account
 
 After both architecture-specific builds complete, a multi-arch manifest is created that combines them into a single image tag.
+
+### Prerequisites
+
+To use this workflow, you need to:
+1. Set up [runs-on](https://github.com/runs-on/runs-on) in your AWS account
+2. Configure the GitHub App integration with your repository
+3. Ensure your AWS account has permissions to launch EC2 instances
 
 ## Local Build
 
