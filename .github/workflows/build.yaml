@@ -12,7 +12,7 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  KEA_VERSION: 2.6
+  KEA_VERSION: 3.0.2
 
 jobs:
   build-kea-dhcp4:
