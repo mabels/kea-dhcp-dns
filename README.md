@@ -45,7 +45,9 @@ volumeMounts:
 
 **Automatically detected** from the latest stable release tag in the [ISC Kea GitLab repository](https://gitlab.isc.org/isc-projects/kea).
 
-The workflow automatically fetches the latest stable release (excluding alpha, beta, and rc versions) from the Kea project tags on every build. No manual version configuration needed!
+The workflow automatically fetches the latest stable release for the configured series (e.g., 3.0.x) from the Kea project tags on every build. The `SERIES` environment variable in the workflow controls which major.minor version series to track.
+
+**Version Series**: Set to `3.0` in the workflow, which filters to only stable 3.0.x releases (excluding alpha, beta, and rc versions).
 
 ## How It Works
 
