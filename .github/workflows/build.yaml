@@ -12,7 +12,6 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  KEA_VERSION: 3.0.2
 
 jobs:
   build-kea-dhcp4:
@@ -21,6 +20,19 @@ jobs:
       contents: read
       packages: write
     steps:
+      - name: Get latest Kea version from GitLab
+        id: kea-version
+        run: |
+          # Fetch latest stable release tag from GitLab Kea project
+          LATEST_TAG=$(git ls-remote --tags --refs https://gitlab.isc.org/isc-projects/kea.git | \
+            grep -v '\-rc\|\-beta\|\-alpha' | \
+            grep 'Kea-' | \
+            sed 's/.*Kea-//' | \
+            sort -V | \
+            tail -n1)
+          echo "version=${LATEST_TAG}" >> $GITHUB_OUTPUT
+          echo "Latest Kea version: ${LATEST_TAG}"
+
       - name: Clone ISC kea-docker repository
         run: git clone https://gitlab.isc.org/isc-projects/kea-docker.git
 
@@ -44,7 +56,7 @@ jobs:
           images: ${{ env.REGISTRY }}/${{ github.repository }}/kea-dhcp4
           tags: |
             type=raw,value=latest
-            type=raw,value=${{ env.KEA_VERSION }}
+            type=raw,value=${{ steps.kea-version.outputs.version }}
             type=sha,prefix=
 
       - name: Build and push kea-dhcp4
@@ -59,7 +71,7 @@ jobs:
           cache-from: type=gha,scope=kea-dhcp4
           cache-to: type=gha,mode=max,scope=kea-dhcp4
           build-args: |
-            VERSION=${{ env.KEA_VERSION }}
+            VERSION=${{ steps.kea-version.outputs.version }}
 
   build-kea-dhcp6:
     runs-on: ubuntu-latest
@@ -67,6 +79,19 @@ jobs:
       contents: read
       packages: write
     steps:
+      - name: Get latest Kea version from GitLab
+        id: kea-version
+        run: |
+          # Fetch latest stable release tag from GitLab Kea project
+          LATEST_TAG=$(git ls-remote --tags --refs https://gitlab.isc.org/isc-projects/kea.git | \
+            grep -v '\-rc\|\-beta\|\-alpha' | \
+            grep 'Kea-' | \
+            sed 's/.*Kea-//' | \
+            sort -V | \
+            tail -n1)
+          echo "version=${LATEST_TAG}" >> $GITHUB_OUTPUT
+          echo "Latest Kea version: ${LATEST_TAG}"
+
       - name: Clone ISC kea-docker repository
         run: git clone https://gitlab.isc.org/isc-projects/kea-docker.git
 
@@ -90,7 +115,7 @@ jobs:
           images: ${{ env.REGISTRY }}/${{ github.repository }}/kea-dhcp6
           tags: |
             type=raw,value=latest
-            type=raw,value=${{ env.KEA_VERSION }}
+            type=raw,value=${{ steps.kea-version.outputs.version }}
             type=sha,prefix=
 
       - name: Build and push kea-dhcp6
@@ -105,7 +130,7 @@ jobs:
           cache-from: type=gha,scope=kea-dhcp6
           cache-to: type=gha,mode=max,scope=kea-dhcp6
           build-args: |
-            VERSION=${{ env.KEA_VERSION }}
+            VERSION=${{ steps.kea-version.outputs.version }}
 
   build-kea-dhcp-ddns:
     runs-on: ubuntu-latest
@@ -113,6 +138,19 @@ jobs:
       contents: read
       packages: write
     steps:
+      - name: Get latest Kea version from GitLab
+        id: kea-version
+        run: |
+          # Fetch latest stable release tag from GitLab Kea project
+          LATEST_TAG=$(git ls-remote --tags --refs https://gitlab.isc.org/isc-projects/kea.git | \
+            grep -v '\-rc\|\-beta\|\-alpha' | \
+            grep 'Kea-' | \
+            sed 's/.*Kea-//' | \
+            sort -V | \
+            tail -n1)
+          echo "version=${LATEST_TAG}" >> $GITHUB_OUTPUT
+          echo "Latest Kea version: ${LATEST_TAG}"
+
       - name: Clone ISC kea-docker repository
         run: git clone https://gitlab.isc.org/isc-projects/kea-docker.git
 
@@ -136,7 +174,7 @@ jobs:
           images: ${{ env.REGISTRY }}/${{ github.repository }}/kea-dhcp-ddns
           tags: |
             type=raw,value=latest
-            type=raw,value=${{ env.KEA_VERSION }}
+            type=raw,value=${{ steps.kea-version.outputs.version }}
             type=sha,prefix=
 
       - name: Build and push kea-dhcp-ddns
@@ -151,5 +189,5 @@ jobs:
           cache-from: type=gha,scope=kea-dhcp-ddns
           cache-to: type=gha,mode=max,scope=kea-dhcp-ddns
           build-args: |
-            VERSION=${{ env.KEA_VERSION }}
+            VERSION=${{ steps.kea-version.outputs.version }}
 

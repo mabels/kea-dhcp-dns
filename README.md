@@ -43,9 +43,9 @@ volumeMounts:
 
 ## Kea Version
 
-Current version: **2.6**
+**Automatically detected** from the latest stable release tag in the [ISC Kea GitLab repository](https://gitlab.isc.org/isc-projects/kea).
 
-To update the Kea version, modify the `KEA_VERSION` environment variable in `.github/workflows/build.yaml`.
+The workflow automatically fetches the latest stable release (excluding alpha, beta, and rc versions) from the Kea project tags on every build. No manual version configuration needed!
 
 ## How It Works
 
