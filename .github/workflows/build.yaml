@@ -24,8 +24,8 @@ jobs:
       - name: Clone ISC kea-docker repository
         run: git clone https://gitlab.isc.org/isc-projects/kea-docker.git
 
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
+      #- name: Set up QEMU
+      #  uses: docker/setup-qemu-action@v3
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -52,7 +52,7 @@ jobs:
         with:
           context: ./kea-docker/kea-dhcp4
           file: ./kea-docker/kea-dhcp4/Dockerfile
-          platforms: linux/amd64,linux/arm64
+          platforms: linux/amd64
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
@@ -70,8 +70,8 @@ jobs:
       - name: Clone ISC kea-docker repository
         run: git clone https://gitlab.isc.org/isc-projects/kea-docker.git
 
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
+      #- name: Set up QEMU
+      #  uses: docker/setup-qemu-action@v3
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -98,7 +98,7 @@ jobs:
         with:
           context: ./kea-docker/kea-dhcp6
           file: ./kea-docker/kea-dhcp6/Dockerfile
-          platforms: linux/amd64,linux/arm64
+          platforms: linux/amd64
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
@@ -116,8 +116,8 @@ jobs:
       - name: Clone ISC kea-docker repository
         run: git clone https://gitlab.isc.org/isc-projects/kea-docker.git
 
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
+      #- name: Set up QEMU
+      #  uses: docker/setup-qemu-action@v3
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -144,7 +144,7 @@ jobs:
         with:
           context: ./kea-docker/kea-dhcp-ddns
           file: ./kea-docker/kea-dhcp-ddns/Dockerfile
-          platforms: linux/amd64,linux/arm64
+          platforms: linux/amd64
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
@@ -152,3 +152,4 @@ jobs:
           cache-to: type=gha,mode=max,scope=kea-dhcp-ddns
           build-args: |
             VERSION=${{ env.KEA_VERSION }}
+
