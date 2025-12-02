@@ -15,14 +15,17 @@ env:
   KEA_VERSION: 2.6.1
 
 jobs:
-  build-kea-dhcp4-amd64:
-    runs-on: runs-on,runner=2cpu-linux-x64
+  build-kea-dhcp4:
+    runs-on: ubuntu-latest
     permissions:
       contents: read
       packages: write
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -34,27 +37,41 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build and push kea-dhcp4 amd64
+      - name: Extract metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ github.repository }}/kea-dhcp4
+          tags: |
+            type=raw,value=latest
+            type=raw,value=${{ env.KEA_VERSION }}
+            type=sha,prefix=
+
+      - name: Build and push kea-dhcp4
         uses: docker/build-push-action@v5
         with:
           context: .
           file: ./Dockerfile.kea-dhcp4
-          platforms: linux/amd64
+          platforms: linux/amd64,linux/arm64
           push: true
-          tags: ${{ env.REGISTRY }}/${{ github.repository }}/kea-dhcp4:latest-amd64
-          cache-from: type=gha,scope=kea-dhcp4-amd64
-          cache-to: type=gha,mode=max,scope=kea-dhcp4-amd64
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
           build-args: |
             KEA_VERSION=${{ env.KEA_VERSION }}
 
-  build-kea-dhcp4-arm64:
-    runs-on: runs-on,runner=2cpu-linux-arm64
+  build-kea-dhcp-ddns:
+    runs-on: ubuntu-latest
     permissions:
       contents: read
       packages: write
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -66,121 +83,26 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build and push kea-dhcp4 arm64
-        uses: docker/build-push-action@v5
+      - name: Extract metadata
+        id: meta
+        uses: docker/metadata-action@v5
         with:
-          context: .
-          file: ./Dockerfile.kea-dhcp4
-          platforms: linux/arm64
-          push: true
-          tags: ${{ env.REGISTRY }}/${{ github.repository }}/kea-dhcp4:latest-arm64
-          cache-from: type=gha,scope=kea-dhcp4-arm64
-          cache-to: type=gha,mode=max,scope=kea-dhcp4-arm64
-          build-args: |
-            KEA_VERSION=${{ env.KEA_VERSION }}
+          images: ${{ env.REGISTRY }}/${{ github.repository }}/kea-dhcp-ddns
+          tags: |
+            type=raw,value=latest
+            type=raw,value=${{ env.KEA_VERSION }}
+            type=sha,prefix=
 
-  create-kea-dhcp4-manifest:
-    needs: [build-kea-dhcp4-amd64, build-kea-dhcp4-arm64]
-    runs-on: runs-on,runner=2cpu-linux-x64
-    permissions:
-      contents: read
-      packages: write
-    steps:
-      - name: Log in to Container Registry
-        uses: docker/login-action@v3
-        with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Create and push multi-arch manifest
-        run: |
-          docker buildx imagetools create -t ${{ env.REGISTRY }}/${{ github.repository }}/kea-dhcp4:latest \
-            -t ${{ env.REGISTRY }}/${{ github.repository }}/kea-dhcp4:${{ env.KEA_VERSION }} \
-            ${{ env.REGISTRY }}/${{ github.repository }}/kea-dhcp4:latest-amd64 \
-            ${{ env.REGISTRY }}/${{ github.repository }}/kea-dhcp4:latest-arm64
-
-  build-kea-dhcp-ddns-amd64:
-    runs-on: runs-on,runner=2cpu-linux-x64
-    permissions:
-      contents: read
-      packages: write
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
-      - name: Log in to Container Registry
-        uses: docker/login-action@v3
-        with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Build and push kea-dhcp-ddns amd64
+      - name: Build and push kea-dhcp-ddns
         uses: docker/build-push-action@v5
         with:
           context: .
           file: ./Dockerfile.kea-dhcp-ddns
-          platforms: linux/amd64
+          platforms: linux/amd64,linux/arm64
           push: true
-          tags: ${{ env.REGISTRY }}/${{ github.repository }}/kea-dhcp-ddns:latest-amd64
-          cache-from: type=gha,scope=kea-dhcp-ddns-amd64
-          cache-to: type=gha,mode=max,scope=kea-dhcp-ddns-amd64
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
           build-args: |
             KEA_VERSION=${{ env.KEA_VERSION }}
-
-  build-kea-dhcp-ddns-arm64:
-    runs-on: runs-on,runner=2cpu-linux-arm64
-    permissions:
-      contents: read
-      packages: write
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
-      - name: Log in to Container Registry
-        uses: docker/login-action@v3
-        with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Build and push kea-dhcp-ddns arm64
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          file: ./Dockerfile.kea-dhcp-ddns
-          platforms: linux/arm64
-          push: true
-          tags: ${{ env.REGISTRY }}/${{ github.repository }}/kea-dhcp-ddns:latest-arm64
-          cache-from: type=gha,scope=kea-dhcp-ddns-arm64
-          cache-to: type=gha,mode=max,scope=kea-dhcp-ddns-arm64
-          build-args: |
-            KEA_VERSION=${{ env.KEA_VERSION }}
-
-  create-kea-dhcp-ddns-manifest:
-    needs: [build-kea-dhcp-ddns-amd64, build-kea-dhcp-ddns-arm64]
-    runs-on: runs-on,runner=2cpu-linux-x64
-    permissions:
-      contents: read
-      packages: write
-    steps:
-      - name: Log in to Container Registry
-        uses: docker/login-action@v3
-        with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Create and push multi-arch manifest
-        run: |
-          docker buildx imagetools create -t ${{ env.REGISTRY }}/${{ github.repository }}/kea-dhcp-ddns:latest \
-            -t ${{ env.REGISTRY }}/${{ github.repository }}/kea-dhcp-ddns:${{ env.KEA_VERSION }} \
-            ${{ env.REGISTRY }}/${{ github.repository }}/kea-dhcp-ddns:latest-amd64 \
-            ${{ env.REGISTRY }}/${{ github.repository }}/kea-dhcp-ddns:latest-arm64
