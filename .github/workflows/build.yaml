@@ -1,0 +1,108 @@
+name: Build Multi-Arch Kea DHCP Images
+
+on:
+  schedule:
+    # Run every Monday at 02:00 UTC
+    - cron: '0 2 * * 1'
+  push:
+    branches:
+      - main
+      - master
+  workflow_dispatch:
+
+env:
+  REGISTRY: ghcr.io
+  KEA_VERSION: 2.6.1
+
+jobs:
+  build-kea-dhcp4:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ github.repository }}/kea-dhcp4
+          tags: |
+            type=raw,value=latest
+            type=raw,value=${{ env.KEA_VERSION }}
+            type=sha,prefix=
+
+      - name: Build and push kea-dhcp4
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile.kea-dhcp4
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          build-args: |
+            KEA_VERSION=${{ env.KEA_VERSION }}
+
+  build-kea-dhcp-ddns:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ github.repository }}/kea-dhcp-ddns
+          tags: |
+            type=raw,value=latest
+            type=raw,value=${{ env.KEA_VERSION }}
+            type=sha,prefix=
+
+      - name: Build and push kea-dhcp-ddns
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile.kea-dhcp-ddns
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          build-args: |
+            KEA_VERSION=${{ env.KEA_VERSION }}
