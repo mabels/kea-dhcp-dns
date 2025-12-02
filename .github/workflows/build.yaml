@@ -34,6 +34,16 @@ jobs:
           echo "version=${LATEST_TAG}" >> $GITHUB_OUTPUT
           echo "Latest Kea version for series ${{ env.SERIES }}: ${LATEST_TAG}"
 
+      - name: Clone ISC kea-docker repository
+        run: git clone --depth 1 https://gitlab.isc.org/isc-projects/kea-docker.git
+
+      - name: Upload kea-docker repository
+        uses: actions/upload-artifact@v4
+        with:
+          name: kea-docker
+          path: kea-docker/
+          retention-days: 1
+
   build-kea-dhcp4:
     needs: detect-version
     runs-on: ubuntu-latest
@@ -41,8 +51,11 @@ jobs:
       contents: read
       packages: write
     steps:
-      - name: Clone ISC kea-docker repository
-        run: git clone https://gitlab.isc.org/isc-projects/kea-docker.git
+      - name: Download kea-docker repository
+        uses: actions/download-artifact@v4
+        with:
+          name: kea-docker
+          path: kea-docker
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
@@ -88,8 +101,11 @@ jobs:
       contents: read
       packages: write
     steps:
-      - name: Clone ISC kea-docker repository
-        run: git clone https://gitlab.isc.org/isc-projects/kea-docker.git
+      - name: Download kea-docker repository
+        uses: actions/download-artifact@v4
+        with:
+          name: kea-docker
+          path: kea-docker
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
@@ -135,8 +151,11 @@ jobs:
       contents: read
       packages: write
     steps:
-      - name: Clone ISC kea-docker repository
-        run: git clone https://gitlab.isc.org/isc-projects/kea-docker.git
+      - name: Download kea-docker repository
+        uses: actions/download-artifact@v4
+        with:
+          name: kea-docker
+          path: kea-docker
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
