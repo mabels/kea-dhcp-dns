@@ -1,10 +1,11 @@
 # Kea DHCP Multi-Arch Container Images
 
-This repository builds multi-architecture (x86_64 and ARM64) container images for ISC Kea DHCP server and DDNS components.
+This repository builds multi-architecture (x86_64 and ARM64) container images for ISC Kea DHCP server and DDNS components using the [official ISC Kea Docker repository](https://gitlab.isc.org/isc-projects/kea-docker).
 
 ## Images
 
-- `kea-dhcp4`: Kea DHCP4 server
+- `kea-dhcp4`: Kea DHCPv4 server
+- `kea-dhcp6`: Kea DHCPv6 server
 - `kea-dhcp-ddns`: Kea DHCP Dynamic DNS
 
 ## Platforms
@@ -24,8 +25,9 @@ Images are automatically built:
 The images are published to GitHub Container Registry:
 
 ```bash
-docker pull ghcr.io/<your-username>/kea-dhcp-ddns/kea-dhcp4:latest
-docker pull ghcr.io/<your-username>/kea-dhcp-ddns/kea-dhcp-ddns:latest
+docker pull ghcr.io/mabels/kea-dhcp-dns/kea-dhcp4:latest
+docker pull ghcr.io/mabels/kea-dhcp-dns/kea-dhcp6:latest
+docker pull ghcr.io/mabels/kea-dhcp-dns/kea-dhcp-ddns:latest
 ```
 
 ## Configuration
@@ -41,26 +43,30 @@ volumeMounts:
 
 ## Kea Version
 
-Current version: **2.6.1**
+Current version: **2.6**
 
 To update the Kea version, modify the `KEA_VERSION` environment variable in `.github/workflows/build.yaml`.
 
-## Architecture
+## How It Works
 
-The workflow builds multi-arch images using QEMU emulation on GitHub Actions:
-- **Standard GitHub runners** (`ubuntu-latest`)
-- **QEMU emulation** for ARM64 cross-compilation
-- **Docker Buildx** for multi-platform builds
-- Single job builds both `linux/amd64` and `linux/arm64` platforms simultaneously
+The workflow:
+1. Checks out the official [ISC kea-docker repository](https://gitlab.isc.org/isc-projects/kea-docker)
+2. Uses their proven Dockerfiles (Alpine Linux + Cloudsmith packages)
+3. Builds for both `linux/amd64` and `linux/arm64` using QEMU emulation
+4. Publishes multi-arch images to GitHub Container Registry
+
+This approach ensures:
+- Always using official, tested Dockerfiles
+- Automatic updates when ISC updates their Dockerfiles
+- Native Alpine package support for both architectures
+- No custom Dockerfile maintenance needed
 
 ## Local Build
 
-To build locally:
+To build locally, first clone the ISC kea-docker repository:
 
 ```bash
-# Build kea-dhcp4 for your architecture
-docker build -f Dockerfile.kea-dhcp4 -t kea-dhcp4:latest .
-
-# Build kea-dhcp-ddns for your architecture
-docker build -f Dockerfile.kea-dhcp-ddns -t kea-dhcp-ddns:latest .
+git clone https://gitlab.isc.org/isc-projects/kea-docker.git
+cd kea-docker/kea-dhcp4
+docker build --build-arg VERSION=2.6 -t kea-dhcp4:latest .
 ```
