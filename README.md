@@ -45,18 +45,23 @@ Current version: **2.6.1**
 
 To update the Kea version, modify the `KEA_VERSION` environment variable in `.github/workflows/build.yaml`.
 
+## Architecture
+
+The workflow builds on **native runners** for maximum performance:
+- **AMD64 builds** run on standard `ubuntu-latest` runners
+- **ARM64 builds** run on `ubuntu-24.04-arm64` runners
+- No QEMU emulation is used, resulting in faster and more reliable builds
+
+After both architecture-specific builds complete, a multi-arch manifest is created that combines them into a single image tag.
+
 ## Local Build
 
 To build locally:
 
 ```bash
-# Build kea-dhcp4
-docker buildx build --platform linux/amd64,linux/arm64 \
-  -f Dockerfile.kea-dhcp4 \
-  -t kea-dhcp4:latest .
+# Build kea-dhcp4 for your architecture
+docker build -f Dockerfile.kea-dhcp4 -t kea-dhcp4:latest .
 
-# Build kea-dhcp-ddns
-docker buildx build --platform linux/amd64,linux/arm64 \
-  -f Dockerfile.kea-dhcp-ddns \
-  -t kea-dhcp-ddns:latest .
+# Build kea-dhcp-ddns for your architecture
+docker build -f Dockerfile.kea-dhcp-ddns -t kea-dhcp-ddns:latest .
 ```
