@@ -2,11 +2,10 @@
 # Supports ARM64 and AMD64
 FROM alpine:3.22
 
-ARG VERSION=9.18
-
 # Install BIND9 and dependencies
+# Alpine apk uses ~= for version matching (e.g., bind~=9.18 matches 9.18.x)
 RUN apk add --no-cache \
-    bind=${VERSION}* \
+    'bind~=9.18' \
     bind-tools \
     && mkdir -p /var/lib/bind/zones \
     && chown -R named:named /var/lib/bind
