@@ -3,9 +3,9 @@
 FROM alpine:3.22
 
 # Install BIND9 and dependencies
-# Alpine apk uses ~= for version matching (e.g., bind~=9.18 matches 9.18.x)
+# Use whatever version is available in Alpine repos
 RUN apk add --no-cache \
-    'bind~=9.18' \
+    bind \
     bind-tools \
     && mkdir -p /var/lib/bind/zones \
     && chown -R named:named /var/lib/bind
