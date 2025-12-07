@@ -195,6 +195,56 @@ jobs:
           build-args: |
             VERSION=${{ needs.detect-version.outputs.version }}
 
+  build-kea-ctrl-agent:
+    needs: detect-version
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Download kea-docker repository
+        uses: actions/download-artifact@v4
+        with:
+          name: kea-docker
+          path: kea-docker
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ github.repository }}/kea-ctrl-agent
+          tags: |
+            type=raw,value=latest
+            type=raw,value=${{ needs.detect-version.outputs.version }}
+            type=sha,prefix=
+
+      - name: Build and push kea-ctrl-agent
+        uses: docker/build-push-action@v5
+        with:
+          context: ./kea-docker/kea-ctrl-agent
+          file: ./kea-docker/kea-ctrl-agent/Dockerfile
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha,scope=kea-ctrl-agent
+          cache-to: type=gha,mode=max,scope=kea-ctrl-agent
+          build-args: |
+            VERSION=${{ needs.detect-version.outputs.version }}
+
 
   build-stork-server:
     runs-on: ubuntu-latest
